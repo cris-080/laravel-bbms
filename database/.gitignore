@@ -1,0 +1,48 @@
+# Dependencies
+/vendor/
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Laravel Storage & Framework Cache
+/storage/*.key
+/storage/pail
+/storage/framework/cache/*
+!storage/framework/cache/.gitignore
+/storage/framework/sessions/*
+!storage/framework/sessions/.gitignore
+/storage/framework/views/*
+!storage/framework/views/.gitignore
+/storage/framework/testing/*
+!storage/framework/testing/.gitignore
+/storage/app/*
+!storage/app/.gitignore
+/storage/app/public/*
+!storage/app/public/.gitignore
+/bootstrap/cache/*
+!bootstrap/cache/.gitignore
+
+# Public Symlinks & Hot Reload
+/public/storage
+/public/hot
+/public/build
+
+# Environment & Credentials
+.env
+.env.backup
+.env.production
+auth.json
+
+# Testing & Development Tooling
+.phpunit.result.cache
+/.phpunit.cache
+/.vagrant
+Homestead.yaml
+Homestead.json
+.phpactor.json
+
+# Operating System & IDE Specific
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
