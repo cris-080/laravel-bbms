@@ -219,7 +219,7 @@ This is a Capstone project for a Blood Bank Management System. The foundational 
 
 ---
 
-## 2. Current Progress (Completed Tasks)
+## 2. Completed Tasks Log (Done by Member 2)
 The following features have already been built, tested, and pushed to the `main` branch. **Do not rebuild these.** You may reference them for layout and logic structure.
 
 *   **Core Foundation & Schema:** All migrations, Eloquent Models (with `$fillable` and relationships), and `BloodBankSeeder.php` are complete. **[COMPLETED]**
