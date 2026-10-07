@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('donors', function (Blueprint $table) {
+    $table->id();
+    $table->string('name', 100);
+    $table->string('email', 100)->unique()->nullable();
+    $table->integer('age')->nullable();
+    $table->string('sex', 10)->nullable();
+    $table->enum('blood_group', ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']);
+    $table->string('contact_number', 15);
+    $table->text('address')->nullable();
+    $table->date('last_donation_date')->nullable();
+    $table->timestamps();
+});
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('donors');
+    }
+};
