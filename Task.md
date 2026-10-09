@@ -1,103 +1,160 @@
-# Blood Bank Management System (BBMS) — Updated Project Handoff & Remaining Tasks
+# Blood Bank Management System (`FinalTermLaravel_BBMS`)
 
-**Project:** Blood Bank Management System  
+**Course:** ITELEC 4100 – Advanced Web Development (Final Term Project)  
 **Repository:** `https://github.com/cris-080/laravel-bbms.git`  
-**Tech Stack:** Laravel + Inertia.js + React + Tailwind CSS + Laravel Fortify + Spatie Laravel-Permission  
-**Database:** MySQL (`bbms_db`)  
-**Architecture:** MVC with Fat Model / Thin Controller
+**Architecture:** Laravel (MVC Backend) + Inertia.js + React (Component UI) + Tailwind CSS + Laravel Fortify (Headless Auth) + Spatie Laravel-Permission (RBAC)
 
 ---
 
-## 1. IMPORTANT INSTRUCTIONS FOR THE NEXT AI / TEAM MEMBER
+## 🤖 INSTRUCTIONS FOR AI CODING ASSISTANT (READ FIRST)
 
-You are continuing an existing Blood Bank Management System project. **Do not rebuild completed modules.** Review the current repository first, then only work on the remaining tasks listed in this file.
+You are assisting a 3-member development team building and completing a modern **Laravel + Inertia.js + React Blood Bank Management System**.
 
-### Strict Rules
+The main BBMS modules are already implemented. **Do not rebuild completed modules.** Review the repository first and continue only with the remaining verification, cleanup, and integration tasks listed below.
 
-1. Follow Laravel MVC architecture.
-2. Use the **Fat Model / Thin Controller** approach.
-3. Use **Form Requests** for validation where appropriate.
-4. Wrap multi-step database writes in `DB::transaction()`.
-5. Do not invent database columns or tables.
-6. Use the existing database schema only.
-7. Use Inertia.js to pass Laravel controller data directly to React pages.
-8. Keep feature routes modular inside the `routes/` folder.
-9. Use Spatie Laravel-Permission for RBAC.
-10. Protect restricted features on both:
-   - Backend routes/middleware
-   - Frontend navigation/buttons
-11. React pages are located under:
-   `resources/js/pages/`
-12. Do not overwrite teammate work unless a bug is confirmed.
+### Strict Architectural & Coding Rules
 
----
+1. **Follow MVC & Fat Model, Thin Controller**
+   - Keep controllers focused on HTTP handling, validation, transactions, calling model logic, and returning Inertia responses or redirects.
 
-# 2. CURRENT DATABASE MODELS / CORE TABLES
+2. **Never Invent Database Columns or Tables**
+   - Use only the existing migrated schema.
 
-The project currently uses these main BBMS tables/models:
+3. **Use Inertia.js Conventions**
+   - Pass data from Laravel controllers directly to React via `Inertia::render()`.
+   - Use `@inertiajs/react` hooks/components such as `useForm`, `Link`, `Head`, `router`, and `usePage`.
 
-- `users`
-- `donors`
-- `blood_inventory`
-- `donations`
-- `donation_schedules`
-- `blood_requests`
-- `audit_logs`
+4. **Enforce Spatie RBAC on Backend & Frontend**
+   - Backend: use `auth`, `role:admin`, or permission middleware.
+   - Frontend: use `auth.roles` / `auth.permissions` to hide restricted navigation and actions.
 
-Roles are managed using Spatie Laravel-Permission:
+5. **Use Modular Routing**
+   - Keep feature routes inside separate files under `routes/`.
+   - Require them from `routes/web.php`.
 
-- `admin`
-- `staff`
+6. **Use Form Requests Where Appropriate**
+   - Do not place large validation blocks in controllers if a reusable Form Request already exists or should exist.
 
-Blood groups:
+7. **Use `DB::transaction()` for Multi-Step Database Writes**
+   - Especially for inventory changes, blood dispensing, donation recording, and audit logging.
 
-- `A+`
-- `A-`
-- `B+`
-- `B-`
-- `AB+`
-- `AB-`
-- `O+`
-- `O-`
+8. **Do Not Overwrite Completed Teammate Work**
+   - Only fix confirmed bugs or missing functionality.
 
 ---
 
-# 3. COMPLETED FOUNDATION WORK
+## 1. Local Setup Commands for Teammates Cloning the Repo
 
-The following foundation/setup work was already completed before the latest development work:
+After cloning the repository:
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/cris-080/laravel-bbms.git
+cd laravel-bbms
+```
+
+### 2. Install Dependencies
+
+```bash
+composer install
+npm install
+copy .env.example .env
+php artisan key:generate
+```
+
+### 3. Configure MySQL
+
+Use:
+
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=bbms_db
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+Create `bbms_db` in phpMyAdmin and import `bbms_db_clean.sql` if needed.
+
+### 4. Reset Cache
+
+```bash
+php artisan optimize:clear
+```
+
+### 5. Start Development Servers
+
+```bash
+composer run dev
+```
+
+### 6. Default Test Credentials
+
+- **Admin:** `admin@bloodbank.com` / `password123`
+- **Staff:** `john@gmail.com` / `password123`
+
+---
+
+## 2. Completed Tasks Log
+
+The following features are already built and should **not** be rebuilt.
+
+### Core Foundation
 
 - [x] Laravel project setup
 - [x] MySQL database configuration
 - [x] Inertia.js + React integration
 - [x] Tailwind CSS integration
 - [x] Laravel Fortify authentication
-- [x] Spatie Laravel-Permission installation
-- [x] `admin` and `staff` roles
-- [x] Authentication middleware
-- [x] Global auth props through `HandleInertiaRequests.php`
+- [x] Spatie Laravel-Permission
+- [x] Admin and Staff roles
+- [x] Global authenticated user / role / permission props
 - [x] Core migrations
 - [x] Core Eloquent models
-- [x] Blood bank seeder / imported `bbms_db_clean.sql`
-- [x] Base authenticated system layout
-- [x] Analytical Dashboard
-- [x] Blood Inventory module
-- [x] Blood Donation / Collection module
-- [x] Audit Log module
+- [x] `bbms_db_clean.sql`
+- [x] Base authenticated layout
 
-Do **not** recreate these modules.
+### Dashboard
+
+- [x] Analytical dashboard
+- [x] KPI cards
+- [x] Blood inventory overview
+- [x] Recent blood requests
+- [x] Upcoming schedules
+- [x] Admin audit trail
+
+### Blood Inventory
+
+- [x] Inventory listing
+- [x] Blood group stock tracking
+- [x] Integration with donation collection
+- [x] Integration with blood request dispensing
+
+### Donations / Blood Collection
+
+- [x] Record donation
+- [x] Donation history
+- [x] Completed donation increases blood inventory
+- [x] Updates donor `last_donation_date`
+- [x] Uses `DB::transaction()`
+- [x] Audit logging
+
+### Audit Logs
+
+- [x] Audit Log controller
+- [x] Audit Log page
+- [x] Admin-only backend access
+- [x] Admin-only sidebar visibility
 
 ---
 
-# 4. NEWLY COMPLETED WORK
+## 3. Newly Completed Modules
 
-The following modules were completed during the latest development session.
+### 3.1 Donor Management — COMPLETED
 
----
-
-## 4.1 Donor Management — COMPLETED
-
-### Files
-
+**Files:**
 - `app/Http/Controllers/DonorController.php`
 - `app/Http/Requests/DonorRequest.php`
 - `app/Models/Donor.php`
@@ -106,174 +163,128 @@ The following modules were completed during the latest development session.
 - `resources/js/pages/Donors/Create.jsx`
 - `resources/js/pages/Donors/Edit.jsx`
 
-### Features Completed
-
+**Completed Features:**
 - [x] Donor listing
-- [x] Create donor
+- [x] Add donor
 - [x] Edit donor
 - [x] Delete donor
-- [x] Search donors
-- [x] Filter donors by blood group
-- [x] Blood group validation
+- [x] Search donor
+- [x] Filter by blood group
 - [x] Unique email validation
-- [x] Donation eligibility calculation
-- [x] Minimum 56-day interval from `last_donation_date`
-- [x] Display next eligible donation date
-- [x] Audit logging for donor create/update/delete
-- [x] Modular donor routes
-
-### Donor Eligibility
-
-Eligibility logic is kept in `Donor.php`, not duplicated in controllers.
-
-A donor is considered eligible when:
-
-- there is no previous donation date, or
-- at least 56 days have passed since `last_donation_date`
+- [x] Blood group validation
+- [x] 56-day donation eligibility rule
+- [x] Next eligible donation date
+- [x] Audit logging for donor actions
 
 ---
 
-## 4.2 Blood Requests / Dispensing — COMPLETED
+### 3.2 Blood Requests / Dispensing — COMPLETED
 
-### Files
-
+**Files:**
 - `app/Http/Controllers/BloodRequestController.php`
 - `app/Http/Requests/BloodRequestFormRequest.php`
 - `routes/blood-requests.php`
 - `resources/js/pages/BloodRequests/Index.jsx`
 - `resources/js/pages/BloodRequests/Create.jsx`
 
-### Features Completed
-
+**Completed Features:**
 - [x] Create blood request
-- [x] List blood requests
-- [x] New requests default to `Pending`
+- [x] Request listing
+- [x] Pending status on creation
 - [x] Approve and release blood
-- [x] Reject blood requests
-- [x] Validate requested blood group
-- [x] Validate requested units
-- [x] Check available blood inventory before dispensing
-- [x] Prevent negative stock
-- [x] Deduct blood inventory on approval/release
-- [x] Use `DB::transaction()`
-- [x] Use row locking during dispensing
-- [x] Set request status to `Handed Over`
-- [x] Generate reference code in format similar to `TRX-XXXXXX-BLD`
+- [x] Reject blood request
+- [x] Validate blood group
+- [x] Validate units needed
+- [x] Prevent dispensing when stock is insufficient
+- [x] Prevent negative inventory
+- [x] Deduct inventory during approval
+- [x] Row locking / transaction protection
+- [x] Set status to `Handed Over`
+- [x] Generate `TRX-XXXXXX-BLD` reference code
 - [x] Save `released_to`
 - [x] Save `dispensed_at`
-- [x] Audit log blood request creation
-- [x] Audit log dispensing
-- [x] Audit log rejection
-- [x] Show current blood inventory on the request form
+- [x] Audit logging
 
 ---
 
-## 4.3 User & Role Management — COMPLETED
+### 3.3 User & Role Management — COMPLETED
 
-### Files
-
+**Files:**
 - `app/Http/Controllers/UserController.php`
+- `app/Models/User.php`
 - `routes/users.php`
 - `resources/js/pages/Users/Index.jsx`
 - `resources/js/pages/Users/Create.jsx`
 - `resources/js/pages/Users/Edit.jsx`
-- `app/Models/User.php`
 
-### Features Completed
-
+**Completed Features:**
 - [x] User listing
 - [x] Create user
 - [x] Edit user
 - [x] Delete user
-- [x] Assign `admin` role
-- [x] Assign `staff` role
-- [x] Update user role using Spatie `syncRoles()`
-- [x] Optional password update during edit
-- [x] Prevent logged-in administrator from deleting their own account
-- [x] Audit log user creation
-- [x] Audit log user update
-- [x] Audit log user deletion
-- [x] Entire `/users` module protected by:
-  `auth` + `role:admin`
-
-### User Model Cleanup
-
-`User.php` uses:
-
-```php
-use HasFactory, Notifiable, HasRoles;
-```
-
-Do not duplicate the `HasFactory` / `Notifiable` trait declarations.
+- [x] Assign `admin`
+- [x] Assign `staff`
+- [x] Update roles using Spatie `syncRoles()`
+- [x] Optional password update
+- [x] Prevent current admin from deleting own account
+- [x] Audit logging
+- [x] Admin-only route protection
 
 ---
 
-## 4.4 Donation Schedules — COMPLETED
+### 3.4 Donation Schedules — COMPLETED
 
-### Files
-
+**Files:**
 - `app/Http/Controllers/ScheduleController.php`
 - `routes/schedules.php`
 - `resources/js/pages/Schedules/Index.jsx`
 - `resources/js/pages/Schedules/Create.jsx`
 
-### Features Completed
-
+**Completed Features:**
 - [x] Schedule listing
-- [x] Create donation appointment
-- [x] Link appointment to `donor_id`
-- [x] Select appointment date
-- [x] Select appointment time
-- [x] New schedule defaults to `Scheduled`
-- [x] Mark schedule as `Completed`
-- [x] Mark schedule as `Cancelled`
-- [x] Audit log appointment creation
-- [x] Audit log appointment status changes
-- [x] Modular schedule routes
+- [x] Create appointment
+- [x] Link schedule to donor
+- [x] Appointment date and time
+- [x] Default status `Scheduled`
+- [x] Mark as `Completed`
+- [x] Mark as `Cancelled`
+- [x] Audit logging
 
-### Valid Schedule Statuses
-
-Use only:
-
+**Allowed Status Values:**
 - `Scheduled`
 - `Completed`
 - `Cancelled`
 
-Do not invent `No Show` unless the database schema is intentionally changed by the team.
-
 ---
 
-## 4.5 Layout / Flash Messages / Admin Visibility — COMPLETED
+### 3.5 Layout / Flash Messages / RBAC Visibility — COMPLETED
 
-### Updated Files
-
+**Updated Files:**
 - `app/Http/Middleware/HandleInertiaRequests.php`
 - `resources/js/Layouts/AuthenticatedLayout.jsx`
 
-### Features Completed
-
-- [x] Global `flash.success`
-- [x] Global `flash.error`
-- [x] Success notification banner
-- [x] Error notification banner
-- [x] Self-delete warning is visible to the user
-- [x] `Users` sidebar link is admin-only
-- [x] `Audit Log` sidebar link is admin-only
-- [x] Backend protection remains enforced separately
+**Completed Features:**
+- [x] `flash.success`
+- [x] `flash.error`
+- [x] Success message banner
+- [x] Error message banner
+- [x] Users sidebar link hidden from staff
+- [x] Audit Log sidebar link hidden from staff
+- [x] Backend protection remains enforced
 
 ---
 
-# 5. CURRENT MODULE STATUS
+## 4. Current Main Module Status
 
 | Module | Status |
 |---|---|
 | Authentication | ✅ Complete |
 | Roles & Permissions | ✅ Complete |
-| Authenticated Layout | ✅ Complete |
+| Layout | ✅ Complete |
 | Dashboard | ✅ Complete |
 | Donor Management | ✅ Complete |
 | Blood Inventory | ✅ Complete |
-| Blood Donation / Collection | ✅ Complete |
+| Donations / Collection | ✅ Complete |
 | Blood Requests / Dispensing | ✅ Complete |
 | Donation Schedules | ✅ Complete |
 | User & Role Management | ✅ Complete |
@@ -282,195 +293,155 @@ Do not invent `No Show` unless the database schema is intentionally changed by t
 
 ---
 
-# 6. REMAINING TASKS FOR THE NEXT MEMBER
+## 5. Remaining Tasks
 
-The main BBMS modules are now implemented. The next member should focus on **integration, verification, cleanup, and any explicitly missing auxiliary feature**, rather than rebuilding core modules.
+The main BBMS modules are already implemented. The remaining work is primarily **verification, integration, cleanup, and final testing**.
 
----
+### Priority Task 1: Verify Profile Module
 
-## Priority 1 — Verify Profile Module
-
-Check whether these already exist and work:
+Check whether the following are already present and working:
 
 - `ProfileController.php`
 - `resources/js/pages/Profile/Edit.jsx`
-- profile route(s)
+- profile routes
 
-### If already working
+If already complete, **do not rebuild**.
 
-Do not rebuild them.
+If incomplete, only complete functionality supported by the current user schema:
+- update name
+- update email
+- update password using the existing authentication/profile flow
 
-### If missing or incomplete
-
-Complete only the profile functionality supported by the existing project/authentication setup.
-
-Recommended scope:
-
-- Update authenticated user's name
-- Update authenticated user's email
-- Update password only using the project's existing Fortify/profile setup
-- Do not invent new profile database columns
+Do not invent new profile fields.
 
 ---
 
-## Priority 2 — Full Role-Based Access Testing
+### Priority Task 2: Role-Based Access Testing
 
-Test using both:
+Test with both admin and staff accounts.
 
-### Admin Account
-
-Admin should be able to access:
-
+**Admin should access:**
 - Dashboard
 - Donors
-- Inventory
+- Blood Inventory
 - Donations
-- Schedules
 - Blood Requests
+- Schedules
 - Users
 - Audit Logs
 
-### Staff Account
-
-Staff should be able to access operational modules but should **not** be able to access admin-only modules.
+**Staff should not access:**
+- Users
+- Audit Logs
 
 Verify:
-
-- [ ] `/users` blocked for staff
-- [ ] `/audit-logs` blocked for staff
-- [ ] Users sidebar link hidden for staff
-- [ ] Audit Log sidebar link hidden for staff
-- [ ] Admin links visible for admin
-- [ ] Direct URL access is protected, not just hidden in the UI
+- [ ] `/users` is blocked for staff
+- [ ] `/audit-logs` is blocked for staff
+- [ ] Admin-only links are hidden from staff
+- [ ] Direct URL access is protected
 
 ---
 
-## Priority 3 — End-to-End Blood Request Test
+### Priority Task 3: Blood Request End-to-End Testing
 
-Test the entire workflow:
-
-1. Create a blood request
-2. Confirm status is `Pending`
-3. Check current stock
-4. Approve request
-5. Enter `released_to`
-6. Confirm stock decreases correctly
-7. Confirm request becomes `Handed Over`
-8. Confirm `reference_code` exists
-9. Confirm `dispensed_at` is saved
-10. Confirm audit log entry exists
-
-Also test:
-
-- [ ] requesting more blood than available
-- [ ] approving an already completed request
-- [ ] rejecting a pending request
-- [ ] attempting to reject an already completed request
-- [ ] no negative blood inventory is possible
+Verify:
+- [ ] Create request
+- [ ] Request defaults to `Pending`
+- [ ] Approve request
+- [ ] Stock decreases correctly
+- [ ] Status becomes `Handed Over`
+- [ ] `reference_code` is generated
+- [ ] `released_to` is saved
+- [ ] `dispensed_at` is saved
+- [ ] Audit log is created
+- [ ] Insufficient stock is blocked
+- [ ] Negative inventory is impossible
+- [ ] Completed request cannot be approved again
+- [ ] Completed request cannot be rejected
 
 ---
 
-## Priority 4 — End-to-End Donation Collection Test
+### Priority Task 4: Donation Collection Regression Test
 
-Verify the previously completed Donation module still works correctly after the latest changes.
-
-Expected behavior:
-
-1. Select donor
-2. Record donation
-3. If donation is `Completed`:
-   - matching `blood_inventory.total_units` increases
-   - donor `last_donation_date` updates
-4. Audit log is created
-
-Also test cancellation/deletion logic if already implemented.
+Verify:
+- [ ] Completed donation increases inventory
+- [ ] Donor `last_donation_date` updates
+- [ ] Audit log is created
+- [ ] Existing cancellation/deletion stock adjustment still works if implemented
 
 Do not rewrite the Donation module unless a real bug is found.
 
 ---
 
-## Priority 5 — Donor Eligibility + Schedule Integration Testing
+### Priority Task 5: Donor Eligibility & Schedule Testing
 
 Verify:
-
-- [ ] Donor eligibility correctly uses the 56-day rule
-- [ ] Donor without prior donation is eligible
-- [ ] Recently donated donor is shown as not eligible
+- [ ] 56-day rule is correct
+- [ ] Donor with no previous donation is eligible
+- [ ] Recent donor is not eligible
 - [ ] Next eligible date is correct
-- [ ] Schedule creation links to the correct donor
-- [ ] Schedule status changes to Completed
-- [ ] Schedule status changes to Cancelled
-- [ ] Audit logs are created for scheduling actions
-
-If the team decides that ineligible donors should be blocked from scheduling, implement that only after confirming it is a team requirement.
+- [ ] Schedule connects to the correct donor
+- [ ] Schedule can be completed
+- [ ] Schedule can be cancelled
+- [ ] Audit logs are created
 
 ---
 
-## Priority 6 — Dashboard Regression Check
+### Priority Task 6: Dashboard Regression Check
 
-Do not rebuild the Dashboard.
+Do not rebuild Dashboard.
 
-Verify that its counts still reflect the updated modules:
-
+Verify:
 - Total Donors
 - Total Blood Units
 - Pending Requests
 - Upcoming Schedules
 - Completed Donations
-- Blood inventory status
-- Recent requests
-- Upcoming schedules
-- Admin audit trail
+- Blood Inventory
+- Recent Requests
+- Upcoming Schedules
+- Admin Audit Trail
 
-Fix only confirmed bugs.
+Fix only confirmed issues.
 
 ---
 
-## Priority 7 — UI / Navigation Cleanup
+### Priority Task 7: UI / Navigation Cleanup
 
-Review the sidebar and pages for:
-
-- duplicate menu items
+Check for:
+- duplicate links
 - dead links
-- routes that do not exist
-- inconsistent page naming
-- buttons that lead to missing pages
-- admin-only links accidentally visible to staff
-- responsive layout issues
+- missing routes
+- inconsistent labels
+- broken buttons
+- staff seeing admin-only links
+- responsive issues
 
-Important:
-
-If `/history` does not have an implemented route/page, either connect it to the existing Donation History view or remove/hide the dead navigation item after confirming the intended design with the team.
-
-Do not invent a new history module if the Donations Index already serves as donation history.
+Special check:
+- If `/history` does not have an implemented route/page, either connect it to the existing Donation History page or remove the dead navigation item after confirming team intent.
 
 ---
 
-## Priority 8 — Validation & Error Handling Review
+### Priority Task 8: Validation & Error Handling Review
 
-Verify all forms display Laravel validation messages correctly.
-
-Review:
-
+Verify validation messages for:
 - Donor forms
 - Blood Request form
 - Schedule form
 - User form
 - Donation form
 
-Also verify global flash banners:
-
+Verify global:
 - `flash.success`
 - `flash.error`
 
-No raw exception page should appear during normal user actions.
+Normal user actions should not result in raw exception pages.
 
 ---
 
-## Priority 9 — Audit Log Coverage
+### Priority Task 9: Audit Log Coverage
 
-Confirm audit entries are created for major actions:
-
+Confirm audit entries exist for:
 - donor created
 - donor updated
 - donor deleted
@@ -484,48 +455,96 @@ Confirm audit entries are created for major actions:
 - user updated
 - user deleted
 
-Do not duplicate audit records unnecessarily.
-
 ---
 
-## Priority 10 — Final Integration & Merge Preparation
+### Priority Task 10: Final Integration & Merge Preparation
 
-Before merging to `main`:
-
-1. Pull the latest `main`
-2. Resolve conflicts carefully
-3. Do not overwrite teammate modules
-4. Run:
+Before final submission / merge:
 
 ```bash
 php artisan optimize:clear
 php artisan route:list
-```
-
-5. Run the application:
-
-```bash
 composer run dev
 ```
 
-6. Test all major pages
-7. Test admin account
-8. Test staff account
-9. Confirm database writes are correct
-10. Check Git status
-11. Do not commit local database files such as:
-
-```text
-database/database.sqlite
-```
-
-The project currently uses MySQL (`bbms_db`).
+Then:
+- [ ] test all major pages
+- [ ] test Admin
+- [ ] test Staff
+- [ ] verify inventory writes
+- [ ] verify audit logs
+- [ ] verify no dead routes
+- [ ] check `git status`
+- [ ] do not commit `database/database.sqlite`
 
 ---
 
-# 7. IMPORTANT ROUTES TO VERIFY
+## 6. Important Business Rules
 
-Expected modular feature routes include:
+### Blood Donation
+
+When a donation is `Completed`:
+
+```text
+blood_inventory.total_units += units_donated
+```
+
+and:
+
+```text
+donors.last_donation_date = donation_date
+```
+
+Use `DB::transaction()`.
+
+### Blood Dispensing
+
+Before dispensing:
+
+```text
+blood_inventory.total_units >= blood_requests.units_needed
+```
+
+If valid:
+
+```text
+blood_inventory.total_units -= units_needed
+status = Handed Over
+reference_code = TRX-XXXXXX-BLD
+released_to = recipient
+dispensed_at = current datetime
+```
+
+If invalid:
+- do not dispense
+- do not allow negative inventory
+
+### Donor Eligibility
+
+```text
+Minimum 56 days since last_donation_date
+```
+
+### Schedule Status Values
+
+```text
+Scheduled
+Completed
+Cancelled
+```
+
+### Roles
+
+```text
+admin
+staff
+```
+
+---
+
+## 7. Expected Modular Routes
+
+The project should include:
 
 ```text
 /dashboard
@@ -538,7 +557,7 @@ Expected modular feature routes include:
 /audit-logs
 ```
 
-Expected modular route files include:
+Expected route files:
 
 ```text
 routes/donors.php
@@ -550,97 +569,11 @@ routes/users.php
 routes/audit-logs.php
 ```
 
-Do not dump all routes directly into `routes/web.php`.
-
-`routes/web.php` should load the feature route files.
+Do not place all module routes directly inside `routes/web.php`.
 
 ---
 
-# 8. IMPORTANT BUSINESS RULES
-
-## Blood Donation
-
-Completed donation:
-
-```text
-blood_inventory.total_units += units_donated
-```
-
-and updates:
-
-```text
-donors.last_donation_date
-```
-
-Use a database transaction.
-
----
-
-## Blood Dispensing
-
-Before release:
-
-```text
-blood_inventory.total_units >= blood_requests.units_needed
-```
-
-If true:
-
-```text
-blood_inventory.total_units -= units_needed
-status = Handed Over
-reference_code = TRX-XXXXXX-BLD
-released_to = recipient
-dispensed_at = current datetime
-```
-
-If false:
-
-```text
-DO NOT dispense
-DO NOT allow negative stock
-```
-
-Use a database transaction.
-
----
-
-## Donor Eligibility
-
-Minimum interval:
-
-```text
-56 days since last_donation_date
-```
-
----
-
-## Schedule Status
-
-Allowed:
-
-```text
-Scheduled
-Completed
-Cancelled
-```
-
----
-
-## Roles
-
-Allowed:
-
-```text
-admin
-staff
-```
-
----
-
-# 9. FILES THAT SHOULD NOT BE REBUILT WITHOUT A CONFIRMED BUG
-
-The next AI/team member should treat these as completed:
+## 8. Files That Should Not Be Rebuilt Without a Confirmed Bug
 
 ```text
 app/Http/Controllers/DonorController.php
@@ -672,26 +605,17 @@ routes/users.php
 routes/audit-logs.php
 ```
 
-If a file name differs slightly in the actual repository, inspect the repository first instead of creating a duplicate.
+Inspect the repository first if a file name differs.
 
 ---
 
-# 10. COPY-PASTE PROMPT FOR THE NEXT AI
-
-> Read the attached `Task.md` carefully before changing the project. The main BBMS modules are already implemented. Do not rebuild completed controllers, routes, models, or React pages. Follow Laravel + Inertia.js + React + Tailwind CSS + Spatie RBAC, keep Fat Model / Thin Controller architecture, use the existing database schema only, and use `DB::transaction()` for multi-step database writes.
->
-> Start with Section 6 of `Task.md`. First verify whether the Profile module is already complete. Then perform role-based access testing, blood request/dispensing integration testing, donation collection regression testing, donor eligibility and schedule testing, dashboard regression testing, navigation cleanup, validation/error handling checks, and audit-log coverage. Only fix confirmed missing or broken functionality. Do not overwrite completed teammate work.
-
----
-
-# 11. CURRENT HANDOFF SUMMARY
-
-The BBMS is now feature-complete for the main operational modules.
+## 9. Updated Handoff Summary
 
 ### Completed
 
 - Authentication
 - RBAC
+- Layout
 - Dashboard
 - Donors
 - Inventory
@@ -700,20 +624,22 @@ The BBMS is now feature-complete for the main operational modules.
 - Schedules
 - Users
 - Audit Logs
-- Flash notifications
+- Flash Notifications
 - Admin-only navigation restrictions
 
 ### Remaining
 
-Primarily:
-
 - Profile verification/completion if needed
-- integration testing
-- role/access testing
-- regression testing
-- navigation cleanup
-- validation review
-- audit log verification
-- final merge preparation
+- Integration testing
+- Role/access testing
+- Regression testing
+- Navigation cleanup
+- Validation review
+- Audit log verification
+- Final merge/submission preparation
 
-**Do not restart the project from scratch. Continue from the current repository state.**
+---
+
+## 10. Copy-Paste Prompt for Teammate to Give Their AI
+
+> **"Read the attached `Task.md` carefully. The main BBMS modules are already implemented. Do not rebuild completed controllers, routes, models, or React pages. Follow the existing Laravel + Inertia.js + React + Tailwind CSS + Spatie RBAC architecture, use the existing database schema only, preserve Fat Model / Thin Controller structure, and use `DB::transaction()` for multi-step database writes. Start with Section 5: verify the Profile module, then perform role-based access testing, blood request/dispensing integration testing, donation regression testing, donor eligibility and schedule testing, dashboard regression testing, navigation cleanup, validation/error handling checks, audit-log coverage, and final integration checks. Only fix confirmed missing or broken functionality."**
