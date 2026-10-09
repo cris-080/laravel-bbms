@@ -25,3 +25,7 @@ require __DIR__.'/inventory.php';
 require __DIR__.'/donations.php';
 require __DIR__.'/audits.php'; // New Audit Route
 require __DIR__.'/donors.php';
+
+require __DIR__.'/blood-requests.php';
+require __DIR__.'/users.php';
+require __DIR__.'/schedules.php';

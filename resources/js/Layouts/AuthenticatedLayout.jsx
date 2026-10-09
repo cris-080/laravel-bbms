@@ -1,7 +1,7 @@
 import { Link, usePage, router } from '@inertiajs/react';
 
 export default function AuthenticatedLayout({ children }) {
-    const { auth } = usePage().props;
+    const { auth, flash } = usePage().props;
     const url = usePage().url;
 
     const handleLogout = (e) => {
@@ -10,13 +10,12 @@ export default function AuthenticatedLayout({ children }) {
     };
 
     const NavLink = ({ href, active, children, icon }) => (
-        <Link 
-            href={href} 
-            className={`flex items-center px-6 py-3 text-sm transition-colors ${
-                active 
-                ? 'bg-red-50 text-red-600 border-l-4 border-red-600 font-medium' 
-                : 'text-gray-600 hover:bg-gray-50 border-l-4 border-transparent'
-            }`}
+        <Link
+            href={href}
+            className={`flex items-center px-6 py-3 text-sm transition-colors ${active
+                    ? 'bg-red-50 text-red-600 border-l-4 border-red-600 font-medium'
+                    : 'text-gray-600 hover:bg-gray-50 border-l-4 border-transparent'
+                }`}
         >
             <span className="w-5 h-5 mr-3">{icon}</span>
             {children}
@@ -31,7 +30,7 @@ export default function AuthenticatedLayout({ children }) {
                     <span className="text-red-600 text-2xl mr-2">🩸</span>
                     <span className="text-lg font-bold tracking-tight text-gray-900">BBMS</span>
                 </div>
-                
+
                 <nav className="flex-1 overflow-y-auto py-4">
                     <NavLink href="/dashboard" active={url.startsWith('/dashboard')} icon="📊">Dashboard</NavLink>
                     <NavLink href="/donors" active={url.startsWith('/donors')} icon="👥">Donors</NavLink>
@@ -40,8 +39,25 @@ export default function AuthenticatedLayout({ children }) {
                     <NavLink href="/inventory" active={url.startsWith('/inventory')} icon="📈">Blood Inventory</NavLink>
                     <NavLink href="/schedules" active={url.startsWith('/schedules')} icon="📅">Schedule</NavLink>
                     <NavLink href="/history" active={url.startsWith('/history')} icon="🕒">Donation History</NavLink>
-                    <NavLink href="/audit-logs" active={url.startsWith('/audit-logs')} icon="📄">Audit Log</NavLink>
-                    <NavLink href="/users" active={url.startsWith('/users')} icon="👤">Users</NavLink>
+                    {auth.roles.includes('admin') && (
+    <>
+        <NavLink
+            href="/audit-logs"
+            active={url.startsWith('/audit-logs')}
+            icon="📄"
+        >
+            Audit Log
+        </NavLink>
+
+        <NavLink
+            href="/users"
+            active={url.startsWith('/users')}
+            icon="👤"
+        >
+            Users
+        </NavLink>
+    </>
+)}
                 </nav>
             </aside>
 
@@ -55,7 +71,7 @@ export default function AuthenticatedLayout({ children }) {
                         </button>
                         <h1 className="text-lg font-semibold text-gray-800">Blood Bank Management System</h1>
                     </div>
-                    
+
                     <div className="flex items-center space-x-4">
                         <div className="text-right flex flex-col justify-center">
                             <span className="text-sm font-bold text-gray-900 leading-tight">{auth.user.name}</span>
@@ -70,6 +86,18 @@ export default function AuthenticatedLayout({ children }) {
 
                 {/* Scrollable Page Content */}
                 <main className="flex-1 p-6 overflow-y-auto">
+                    {flash?.success && (
+                        <div className="mb-4 rounded-lg border border-green-200 bg-green-100 px-4 py-3 text-sm font-medium text-green-700">
+                            {flash.success}
+                        </div>
+                    )}
+
+                    {flash?.error && (
+                        <div className="mb-4 rounded-lg border border-red-200 bg-red-100 px-4 py-3 text-sm font-medium text-red-700">
+                            {flash.error}
+                        </div>
+                    )}
+
                     {children}
                 </main>
             </div>
