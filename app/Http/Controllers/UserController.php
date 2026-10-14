@@ -2,11 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -31,47 +28,13 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                'unique:users,email',
-            ],
-
-            'password' => [
-                'required',
-                'string',
-                'min:8',
-                'confirmed',
-            ],
-
-            'role' => [
-                'required',
-                Rule::in(['admin', 'staff']),
-            ],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+            'role' => ['required', Rule::in(['admin', 'staff'])],
         ]);
 
-        DB::transaction(function () use ($request, $validated) {
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => Hash::make($validated['password']),
-            ]);
-
-            $user->syncRoles([$validated['role']]);
-
-            AuditLog::create([
-                'user_id' => $request->user()->id,
-                'action' => 'Created User',
-                'details' => "Created user {$user->name} with role {$validated['role']}",
-            ]);
-        });
+        User::createUserWithRole($validated, $request->user()->id);
 
         return redirect()
             ->route('users.index')
@@ -95,52 +58,13 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
-            'name' => [
-                'required',
-                'string',
-                'max:255',
-            ],
-
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('users', 'email')->ignore($user->id),
-            ],
-
-            'password' => [
-                'nullable',
-                'string',
-                'min:8',
-                'confirmed',
-            ],
-
-            'role' => [
-                'required',
-                Rule::in(['admin', 'staff']),
-            ],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+            'role' => ['required', Rule::in(['admin', 'staff'])],
         ]);
 
-        DB::transaction(function () use ($request, $validated, $user) {
-            $data = [
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-            ];
-
-            if (!empty($validated['password'])) {
-                $data['password'] = Hash::make($validated['password']);
-            }
-
-            $user->update($data);
-
-            $user->syncRoles([$validated['role']]);
-
-            AuditLog::create([
-                'user_id' => $request->user()->id,
-                'action' => 'Updated User',
-                'details' => "Updated user {$user->name} with role {$validated['role']}",
-            ]);
-        });
+        $user->updateUserWithRole($validated, $request->user()->id);
 
         return redirect()
             ->route('users.index')
@@ -150,23 +74,10 @@ class UserController extends Controller
     public function destroy(Request $request, User $user)
     {
         if ($request->user()->id === $user->id) {
-            return back()->with(
-                'error',
-                'You cannot delete your own account.'
-            );
+            return back()->with('error', 'You cannot delete your own account.');
         }
 
-        DB::transaction(function () use ($request, $user) {
-            $userName = $user->name;
-
-            AuditLog::create([
-                'user_id' => $request->user()->id,
-                'action' => 'Deleted User',
-                'details' => "Deleted user {$userName}",
-            ]);
-
-            $user->delete();
-        });
+        $user->deleteUser($request->user()->id);
 
         return redirect()
             ->route('users.index')

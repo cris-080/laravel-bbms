@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AuditLog;
 use App\Models\DonationSchedule;
 use App\Models\Donor;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
@@ -19,8 +17,16 @@ class ScheduleController extends Controller
             ->orderBy('appointment_time')
             ->paginate(10);
 
+        $donors = Donor::orderBy('name')->get([
+            'id',
+            'name',
+            'blood_group',
+            'last_donation_date',
+        ]);
+
         return Inertia::render('Schedules/Index', [
             'schedules' => $schedules,
+            'donors' => $donors,
         ]);
     }
 
@@ -45,31 +51,18 @@ class ScheduleController extends Controller
                 'required',
                 'exists:donors,id',
             ],
-
             'appointment_date' => [
                 'required',
                 'date',
                 'after_or_equal:today',
             ],
-
             'appointment_time' => [
                 'required',
                 'date_format:H:i',
             ],
         ]);
 
-        DB::transaction(function () use ($request, $validated) {
-            $schedule = DonationSchedule::create([
-                ...$validated,
-                'status' => 'Scheduled',
-            ]);
-
-            AuditLog::create([
-                'user_id' => $request->user()->id,
-                'action' => 'Booked Appointment',
-                'details' => "Booked donation appointment for donor ID {$schedule->donor_id} on {$schedule->appointment_date}",
-            ]);
-        });
+        DonationSchedule::createWithLog($validated, $request->user()->id);
 
         return redirect()
             ->route('schedules.index')
@@ -89,17 +82,7 @@ class ScheduleController extends Controller
             ],
         ]);
 
-        DB::transaction(function () use ($request, $schedule, $validated) {
-            $schedule->update([
-                'status' => $validated['status'],
-            ]);
-
-            AuditLog::create([
-                'user_id' => $request->user()->id,
-                'action' => 'Updated Appointment Status',
-                'details' => "Schedule ID {$schedule->id} changed to {$validated['status']}",
-            ]);
-        });
+        $schedule->updateStatusWithLog($validated['status'], $request->user()->id);
 
         return redirect()
             ->route('schedules.index')

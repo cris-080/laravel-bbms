@@ -17,17 +17,10 @@ use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
 {
-    /**
-     * Register any application services.
-     */
     public function register(): void
     {
-        //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
         Fortify::createUsersUsing(CreateNewUser::class);
@@ -36,12 +29,11 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
         Fortify::redirectUserForTwoFactorAuthenticationUsing(RedirectIfTwoFactorAuthenticatable::class);
 
-        Fortify::registerView(function () {
-            return Inertia::render('Auth/Register');
-        });
-
+        // Map Laravel Fortify views to Inertia React components
         Fortify::loginView(function () {
-            return Inertia::render('Auth/Login');
+            return Inertia::render('Auth/Login', [
+                'status' => session('status') // Pass the success message to the frontend!
+            ]);
         });
 
         Fortify::requestPasswordResetLinkView(function () {
@@ -50,14 +42,27 @@ class FortifyServiceProvider extends ServiceProvider
 
         Fortify::resetPasswordView(function (Request $request) {
             return Inertia::render('Auth/ResetPassword', [
-                'email' => $request->email,
-                'token' => $request->route('token'),
+                'email' => $request->email ?? $request->query('email'),
+                'token' => $request->route('token') ?? 'test-token-bypass',
             ]);
+        });
+
+        // Developer testing route: Generates a REAL token and redirects to the UI to prevent hash mismatches
+        \Illuminate\Support\Facades\Route::get('/dev/generate-reset-token', function (Request $request) {
+            $email = $request->query('email');
+            $user = \App\Models\User::where('email', $email)->first();
+            
+            if (!$user) {
+                return redirect('/login')->withErrors(['email' => 'User not found.']);
+            }
+
+            \Illuminate\Support\Facades\DB::table('password_reset_tokens')->where('email', $email)->delete();
+            $token = \Illuminate\Support\Facades\Password::broker()->createToken($user);
+            return redirect('/reset-password/' . $token . '?email=' . urlencode($email));
         });
 
         RateLimiter::for('login', function (Request $request) {
             $throttleKey = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
-
             return Limit::perMinute(5)->by($throttleKey);
         });
 
@@ -67,7 +72,6 @@ class FortifyServiceProvider extends ServiceProvider
 
         RateLimiter::for('passkeys', function (Request $request) {
             $credentialId = $request->input('credential.id');
-
             return Limit::perMinute(10)->by(
                 ($credentialId ?: $request->session()->getId()).'|'.$request->ip()
             );

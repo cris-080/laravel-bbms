@@ -9,11 +9,8 @@ class AuditLogController extends Controller
 {
     public function index()
     {
-        // Fetch logs with the user who performed the action
-        $logs = AuditLog::with('user')->latest()->get();
-        
         return Inertia::render('AuditLogs/Index', [
-            'logs' => $logs
+            'logs' => AuditLog::getLatestLogsWithUsers()
         ]);
     }
 }

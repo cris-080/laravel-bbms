@@ -95,13 +95,20 @@ export default function Index({ logs }) {
                                         <td className="px-6 py-4 text-gray-500 whitespace-nowrap">
                                             {formatDateTime(log.created_at)}
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="font-extrabold text-gray-900">{log.user?.name || 'System'}</div>
-                                            {/* Gray role pill */}
-                                            <span className="bg-gray-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold inline-block mt-1 tracking-wide">
-                                                Admin
+                                       <td className="px-6 py-4">
+                                        <div className="font-extrabold text-gray-900">{log.user?.name || 'System'}</div>
+                                        {log.user?.roles && log.user.roles.length > 0 ? (
+                                            <span className={`text-white text-[10px] px-2 py-0.5 rounded-full font-bold inline-block mt-1 tracking-wide ${
+                                                log.user.roles[0].name === 'admin' ? 'bg-red-600' : 'bg-gray-500'
+                                            }`}>
+                                                {log.user.roles[0].name.toUpperCase()}
                                             </span>
-                                        </td>
+                                        ) : (
+                                            <span className="bg-gray-500 text-white text-[10px] px-2 py-0.5 rounded-full font-bold inline-block mt-1 tracking-wide">
+                                                SYSTEM
+                                            </span>
+                                        )}
+                                    </td>
                                         <td className="px-6 py-4">
                                             {/* Blue action pill */}
                                             <span className="bg-blue-100 text-blue-600 px-3 py-1.5 rounded-md text-xs font-bold">

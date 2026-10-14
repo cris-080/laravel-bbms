@@ -2,51 +2,100 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Models\AuditLog;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasRoles;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password' => 'hashed', // Automatically hashes passwords on creation/update
         ];
+    }
+
+    /**
+     * Encapsulates user creation, role assignment, and audit logging.
+     */
+    public static function createUserWithRole(array $data, int $actorId): self
+    {
+        return DB::transaction(function () use ($data, $actorId) {
+            $user = self::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'password' => $data['password'],
+            ]);
+
+            $user->syncRoles([$data['role']]);
+
+            AuditLog::create([
+                'user_id' => $actorId,
+                'action' => 'Created User',
+                'details' => "Created user {$user->name} with role {$data['role']}",
+            ]);
+
+            return $user;
+        });
+    }
+
+    /**
+     * Encapsulates user updates, role syncing, and audit logging.
+     */
+    public function updateUserWithRole(array $data, int $actorId): void
+    {
+        DB::transaction(function () use ($data, $actorId) {
+            $updateData = [
+                'name' => $data['name'],
+                'email' => $data['email'],
+            ];
+
+            if (!empty($data['password'])) {
+                $updateData['password'] = $data['password'];
+            }
+
+            $this->update($updateData);
+            $this->syncRoles([$data['role']]);
+
+            AuditLog::create([
+                'user_id' => $actorId,
+                'action' => 'Updated User',
+                'details' => "Updated user {$this->name} with role {$data['role']}",
+            ]);
+        });
+    }
+
+    /**
+     * Encapsulates user deletion and audit logging.
+     */
+    public function deleteUser(int $actorId): void
+    {
+        DB::transaction(function () use ($actorId) {
+            AuditLog::create([
+                'user_id' => $actorId,
+                'action' => 'Deleted User',
+                'details' => "Deleted user {$this->name}",
+            ]);
+
+            $this->delete();
+        });
     }
 }
