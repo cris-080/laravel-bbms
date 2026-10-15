@@ -8,12 +8,16 @@ use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Laravel\Fortify\Actions\RedirectIfTwoFactorAuthenticatable;
 use Laravel\Fortify\Fortify;
+use Illuminate\Support\Facades\Password;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -32,7 +36,7 @@ class FortifyServiceProvider extends ServiceProvider
         // Map Laravel Fortify views to Inertia React components
         Fortify::loginView(function () {
             return Inertia::render('Auth/Login', [
-                'status' => session('status') // Pass the success message to the frontend!
+                'status' => session('status') 
             ]);
         });
 
@@ -48,16 +52,16 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         // Developer testing route: Generates a REAL token and redirects to the UI to prevent hash mismatches
-        \Illuminate\Support\Facades\Route::get('/dev/generate-reset-token', function (Request $request) {
+        Route::get('/dev/generate-reset-token', function (Request $request) {
             $email = $request->query('email');
-            $user = \App\Models\User::where('email', $email)->first();
+            $user = User::where('email', $email)->first();
             
             if (!$user) {
                 return redirect('/login')->withErrors(['email' => 'User not found.']);
             }
 
-            \Illuminate\Support\Facades\DB::table('password_reset_tokens')->where('email', $email)->delete();
-            $token = \Illuminate\Support\Facades\Password::broker()->createToken($user);
+            DB::table('password_reset_tokens')->where('email', $email)->delete();
+            $token = Password::broker()->createToken($user);
             return redirect('/reset-password/' . $token . '?email=' . urlencode($email));
         });
 
