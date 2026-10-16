@@ -28,7 +28,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed', // Automatically hashes passwords on creation/update
+            'password' => 'hashed',
         ];
     }
 

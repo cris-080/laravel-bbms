@@ -9,16 +9,18 @@ use Inertia\Inertia;
 
 class UserController extends Controller
 {
-    public function index()
-    {
-        $users = User::with('roles')
-            ->latest()
-            ->paginate(10);
+   public function index(Request $request)
+{
+    
+    $users = User::with('roles')
+        ->where('id', '!=', $request->user()->id) 
+        ->latest()
+        ->paginate(10);
 
-        return Inertia::render('Users/Index', [
-            'users' => $users,
-        ]);
-    }
+    return Inertia::render('Users/Index', [
+        'users' => $users
+    ]);
+}
 
     public function create()
     {

@@ -42,7 +42,7 @@ export default function Login() {
 
     return (
         <>
-            <Head title="Sign In — Blood Bank Management System" />
+            <Head title="Log In — Blood Bank Management System" />
 
             <div className="min-h-screen flex flex-col lg:flex-row bg-white">
                 {/* Left Side: System Branding & Information */}
@@ -85,7 +85,7 @@ export default function Login() {
                     <div className="w-full max-w-sm space-y-8">
                         <div>
                             <h2 className="text-3xl font-extrabold tracking-tight text-gray-900">
-                                Sign In
+                                Log In
                             </h2>
                             <p className="text-xs text-gray-500 mt-1 leading-relaxed">
                                 Enter your registered credentials to access your session.
@@ -208,7 +208,7 @@ export default function Login() {
                                     </>
                                 ) : (
                                     <>
-                                        <span>Sign In to System</span>
+                                        <span>Log In</span>
                                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                                         </svg>
