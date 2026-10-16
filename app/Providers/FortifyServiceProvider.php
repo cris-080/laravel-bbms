@@ -51,7 +51,7 @@ class FortifyServiceProvider extends ServiceProvider
             ]);
         });
 
-        // Developer testing route: Generates a REAL token and redirects to the UI to prevent hash mismatches
+        
         Route::get('/dev/generate-reset-token', function (Request $request) {
             $email = $request->query('email');
             $user = User::where('email', $email)->first();
